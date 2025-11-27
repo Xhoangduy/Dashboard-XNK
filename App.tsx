@@ -15,7 +15,8 @@ import {
   Search,
   Filter,
   Calendar,
-  X
+  X,
+  User
 } from 'lucide-react';
 import { PieChart, Pie, Cell, ResponsiveContainer, Legend, Tooltip } from 'recharts';
 
@@ -53,6 +54,14 @@ const removeAccents = (str: string) => {
     .replace(/[\u0300-\u036f]/g, "")
     .replace(/đ/g, "d")
     .replace(/Đ/g, "D");
+};
+
+const normalizeDate = (dateStr: string) => {
+  if (!dateStr) return '';
+  // Try to parse and return YYYY-MM-DD to ensure consistent comparison
+  const d = new Date(dateStr);
+  if (isNaN(d.getTime())) return dateStr; // Fallback if invalid
+  return d.toISOString().split('T')[0];
 };
 
 const getStatusBadge = (status: OrderStatus) => {
@@ -123,14 +132,15 @@ const App: React.FC = () => {
           normalize(order.orderCode).includes(search) ||
           normalize(order.containerNo).includes(search) ||
           normalize(order.origin).includes(search) ||
-          normalize(order.destination).includes(search);
+          normalize(order.destination).includes(search) ||
+          normalize(order.pickupDate).includes(search); // Added date to text search
       }
       
       // 2. Status Filter
       const matchesStatus = filterStatus === 'ALL' || order.status === filterStatus;
       
-      // 3. Date Filter (Exact string match yyyy-mm-dd)
-      const matchesDate = !filterDate || order.pickupDate === filterDate;
+      // 3. Date Filter (Robust YYYY-MM-DD match)
+      const matchesDate = !filterDate || normalizeDate(order.pickupDate) === normalizeDate(filterDate);
 
       return matchesText && matchesStatus && matchesDate;
     });
@@ -145,22 +155,23 @@ const App: React.FC = () => {
   const hasActiveFilters = filterText !== '' || filterStatus !== 'ALL' || filterDate !== '';
 
   return (
-    <div className="min-h-screen flex flex-col">
+    <div className="min-h-screen flex flex-col font-sans text-gray-900 bg-[#f3f4f6]">
       <Header />
 
-      <main className="flex-grow container mx-auto px-4 py-6 space-y-6">
+      <main className="flex-grow container mx-auto px-4 py-8 space-y-8">
         
-        {/* Top Section: Split Stats and Company Profile for better spacing and control */}
-        <div className="flex flex-col xl:flex-row gap-6">
+        {/* Top Section: Stats and Company Profile */}
+        <div className="flex flex-col xl:flex-row gap-8">
           
           {/* Left: Stats Grid */}
-          <div className="grid grid-cols-1 md:grid-cols-3 lg:grid-cols-3 xl:grid-cols-5 gap-4 flex-grow">
+          <div className="grid grid-cols-2 md:grid-cols-3 xl:grid-cols-5 gap-6 flex-grow w-full">
             <StatsCard 
               label="Tổng đơn hàng" 
               value={TOTAL_ORDERS} 
               icon={<Package className="w-6 h-6" />}
               bgColor="bg-gray-100"
               textColor="text-gray-600"
+              className="h-full"
             />
             <StatsCard 
               label="Thành công" 
@@ -168,6 +179,7 @@ const App: React.FC = () => {
               icon={<CheckCircle className="w-6 h-6" />}
               bgColor="bg-green-100"
               textColor="text-green-600"
+              className="h-full"
             />
             <StatsCard 
               label="Đang vận chuyển" 
@@ -175,6 +187,7 @@ const App: React.FC = () => {
               icon={<Truck className="w-6 h-6" />}
               bgColor="bg-blue-100"
               textColor="text-blue-600"
+              className="h-full"
             />
             <StatsCard 
               label="Chờ vận chuyển" 
@@ -182,6 +195,7 @@ const App: React.FC = () => {
               icon={<Clock className="w-6 h-6" />}
               bgColor="bg-yellow-100"
               textColor="text-yellow-600"
+              className="h-full"
             />
             <StatsCard 
               label="Đã hủy" 
@@ -189,60 +203,71 @@ const App: React.FC = () => {
               icon={<XCircle className="w-6 h-6" />}
               bgColor="bg-red-100"
               textColor="text-red-600"
+              className="h-full"
             />
           </div>
 
           {/* Right: User Profile Card */}
-          <div className="bg-white rounded-lg p-5 shadow-sm border border-gray-100 flex flex-col justify-between w-full xl:w-96 flex-shrink-0">
-            <div className="flex justify-between items-start mb-4">
-              <div className="flex items-center gap-3">
-                <div className="w-12 h-12 bg-gray-200 rounded-full flex-shrink-0"></div>
-                <div className="flex items-center gap-2">
-                  <h3 className="font-bold text-lg text-gray-800">Administrator</h3>
-                  <Edit className="w-4 h-4 text-gray-500 cursor-pointer hover:text-gray-700" />
+          <div className="bg-white rounded-lg shadow-sm border border-gray-200 w-full xl:w-[380px] flex-shrink-0 p-6 flex flex-col gap-6">
+             {/* Header */}
+             <div className="flex justify-between items-start">
+                <div className="flex items-center gap-4">
+                  <div className="w-12 h-12 bg-gray-100 rounded-full flex items-center justify-center text-gray-400 shrink-0">
+                     <User className="w-6 h-6" />
+                  </div>
+                  <div>
+                     <h3 className="font-bold text-lg text-gray-900 flex items-center gap-2">
+                        Administrator 
+                        <Edit className="w-3.5 h-3.5 text-gray-400 cursor-pointer hover:text-teal-600 transition-colors" />
+                     </h3>
+                     <p className="text-xs text-teal-600 font-semibold uppercase tracking-wide">Quản trị viên</p>
+                  </div>
                 </div>
-              </div>
-              <button className="bg-[#00bfa5] hover:bg-teal-600 text-white px-4 py-1.5 rounded-md text-sm font-semibold transition-colors shadow-sm">
-                Đặt xe
-              </button>
-            </div>
-            
-            <div className="space-y-4 pl-1">
-              <div className="flex items-baseline gap-2 text-sm">
-                <span className="italic text-gray-600 min-w-[85px]">Mã số thuế:</span>
-                <span className="text-gray-800 font-medium"></span>
-              </div>
-              <div className="flex items-baseline gap-2 text-sm">
-                <span className="italic text-gray-600 min-w-[85px]">Địa chỉ:</span>
-                <span className="text-gray-800 font-medium uppercase">CTY TNHH DV TIN HỌC CEH</span>
-              </div>
-              <div className="flex items-baseline gap-2 text-sm">
-                <span className="italic text-gray-600 min-w-[85px]">Email:</span>
-                <span className="text-gray-800 font-medium">doanvanhieu.info@gmail.com</span>
-              </div>
-              <div className="flex items-baseline gap-2 text-sm">
-                <span className="italic text-gray-600 min-w-[85px]">Điện thoại:</span>
-                <span className="text-gray-800 font-medium">4324234332</span>
-              </div>
-            </div>
+                <button className="bg-teal-600 hover:bg-teal-700 text-white px-4 py-2 rounded-md text-sm font-medium shadow-sm transition-colors whitespace-nowrap">
+                   Đặt xe
+                </button>
+             </div>
+
+             {/* Divider */}
+             <div className="h-px bg-gray-100 w-full"></div>
+
+             {/* Info Rows */}
+             <div className="space-y-4">
+                <div className="flex text-sm items-start">
+                   <span className="text-gray-500 italic w-24 flex-shrink-0">Mã số thuế:</span>
+                   <span className="text-gray-900 font-medium"></span>
+                </div>
+                <div className="flex text-sm items-start">
+                   <span className="text-gray-500 italic w-24 flex-shrink-0">Địa chỉ:</span>
+                   <span className="text-gray-900 font-medium uppercase leading-snug">CTY TNHH DV TIN HỌC CEH</span>
+                </div>
+                <div className="flex text-sm items-start">
+                   <span className="text-gray-500 italic w-24 flex-shrink-0">Email:</span>
+                   <span className="text-gray-900 font-medium break-all">doanvanhieu.info@gmail.com</span>
+                </div>
+                <div className="flex text-sm items-start">
+                   <span className="text-gray-500 italic w-24 flex-shrink-0">Điện thoại:</span>
+                   <span className="text-gray-900 font-medium">4324234332</span>
+                </div>
+             </div>
           </div>
         </div>
 
         {/* Orders Table Section */}
-        <div className="bg-white rounded-lg shadow-sm border border-gray-100 overflow-hidden">
-          <div className="p-4 border-b border-gray-100 flex flex-col gap-4">
+        <div className="bg-white rounded-lg shadow-sm border border-gray-200 overflow-hidden">
+          <div className="p-5 border-b border-gray-200 flex flex-col gap-5">
             {/* Header Title & Actions */}
             <div className="flex justify-between items-center">
               <div className="flex items-center gap-2">
                 <Truck className="w-5 h-5 text-[#006A65]" />
-                <h2 className="font-bold text-gray-800">Danh sách đơn hàng cần vận chuyển</h2>
+                <h2 className="font-bold text-lg text-gray-900">Danh sách đơn hàng cần vận chuyển</h2>
               </div>
               <div className="flex items-center gap-4">
                  <div className="relative">
-                   <Bell className="w-5 h-5 text-red-500 cursor-pointer" />
+                   <Bell className="w-5 h-5 text-red-500 cursor-pointer hover:opacity-80 transition-opacity" />
                    <span className="absolute -top-1 -right-1 bg-red-600 text-white text-[10px] w-3.5 h-3.5 flex items-center justify-center rounded-full">36</span>
                  </div>
-                 <button className="flex items-center gap-1 text-xs text-teal-600 font-medium hover:underline">
+                 <button className="flex items-center gap-1 text-xs text-teal-600 font-semibold hover:underline">
                    <ArrowRight className="w-4 h-4" />
                    Chi tiết
                  </button>
@@ -250,7 +275,7 @@ const App: React.FC = () => {
             </div>
 
             {/* Filter Bar */}
-            <div className="flex flex-col md:flex-row items-start md:items-center gap-3 bg-gray-50 p-3 rounded-md border border-gray-100">
+            <div className="flex flex-col md:flex-row items-start md:items-center gap-3 bg-gray-50 p-4 rounded-lg border border-gray-200">
                {/* Search */}
                <div className="relative flex-grow w-full md:w-auto">
                  <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
@@ -258,7 +283,7 @@ const App: React.FC = () => {
                  </div>
                  <input 
                    type="text" 
-                   placeholder="Tìm kiếm mã đơn, container, địa điểm..." 
+                   placeholder="Tìm kiếm mã đơn, container, địa điểm, ngày..." 
                    className="w-full pl-9 pr-3 py-2 text-sm border border-gray-300 rounded-md focus:outline-none focus:ring-1 focus:ring-teal-500 bg-white text-gray-900 placeholder-gray-500"
                    value={filterText}
                    onChange={(e) => setFilterText(e.target.value)}
@@ -271,7 +296,7 @@ const App: React.FC = () => {
                    <Filter className="h-4 w-4 text-gray-400" />
                  </div>
                  <select
-                   className="w-full pl-9 pr-3 py-2 text-sm border border-gray-300 rounded-md focus:outline-none focus:ring-1 focus:ring-teal-500 appearance-none bg-white text-gray-900"
+                   className="w-full pl-9 pr-3 py-2 text-sm border border-gray-300 rounded-md focus:outline-none focus:ring-1 focus:ring-teal-500 appearance-none bg-white text-gray-900 cursor-pointer"
                    value={filterStatus}
                    onChange={(e) => setFilterStatus(e.target.value)}
                  >
@@ -290,7 +315,7 @@ const App: React.FC = () => {
                  </div>
                  <input 
                    type="date" 
-                   className="w-full pl-9 pr-3 py-2 text-sm border border-gray-300 rounded-md focus:outline-none focus:ring-1 focus:ring-teal-500 bg-white text-gray-900 placeholder-gray-500"
+                   className="w-full pl-9 pr-3 py-2 text-sm border border-gray-300 rounded-md focus:outline-none focus:ring-1 focus:ring-teal-500 bg-white text-gray-900 placeholder-gray-500 cursor-pointer"
                    value={filterDate}
                    onChange={(e) => setFilterDate(e.target.value)}
                  />
@@ -300,7 +325,7 @@ const App: React.FC = () => {
                {hasActiveFilters && (
                  <button 
                    onClick={clearFilters}
-                   className="flex items-center gap-1 text-sm text-red-500 hover:text-red-700 font-medium px-2 py-1 whitespace-nowrap"
+                   className="flex items-center gap-1 text-sm text-red-500 hover:text-red-700 font-medium px-2 py-1 whitespace-nowrap transition-colors"
                  >
                    <X className="w-4 h-4" />
                    Xóa lọc
@@ -311,16 +336,16 @@ const App: React.FC = () => {
 
           <div className="overflow-x-auto">
             <table className="w-full text-sm text-left">
-              <thead className="bg-gray-50 text-gray-600 font-semibold border-b border-gray-200">
+              <thead className="bg-gray-50 text-gray-700 font-semibold border-b border-gray-200">
                 <tr>
-                  <th className="px-4 py-3">STT</th>
-                  <th className="px-4 py-3">Mã đơn hàng</th>
-                  <th className="px-4 py-3">Số xe / Cont</th>
-                  <th className="px-4 py-3 text-right">Cước phí (VNĐ)</th>
-                  <th className="px-4 py-3">Ngày lấy hàng</th>
-                  <th className="px-4 py-3">Nơi lấy hàng</th>
-                  <th className="px-4 py-3">Nơi giao hàng</th>
-                  <th className="px-4 py-3 text-center">Trạng thái</th>
+                  <th className="px-4 py-3 whitespace-nowrap">STT</th>
+                  <th className="px-4 py-3 whitespace-nowrap">Mã đơn hàng</th>
+                  <th className="px-4 py-3 whitespace-nowrap">Số Container</th>
+                  <th className="px-4 py-3 whitespace-nowrap text-right">Số tiền</th>
+                  <th className="px-4 py-3 whitespace-nowrap">Ngày lấy hàng</th>
+                  <th className="px-4 py-3 whitespace-nowrap">Điểm đi</th>
+                  <th className="px-4 py-3 whitespace-nowrap">Điểm đến</th>
+                  <th className="px-4 py-3 whitespace-nowrap text-center">Trạng thái</th>
                 </tr>
               </thead>
               <tbody className="divide-y divide-gray-100">
@@ -330,10 +355,9 @@ const App: React.FC = () => {
                     <td className="px-4 py-3 text-gray-500">{index + 1}</td>
                     <td className="px-4 py-3 font-medium text-teal-700">{order.orderCode}</td>
                     <td className="px-4 py-3">
-                      <div className="font-medium text-gray-800">{order.containerNo}</div>
-                      <div className="text-xs text-gray-500">{order.size} • {order.weight} tấn</div>
+                      <div className="font-medium text-gray-900">{order.containerNo}</div>
                     </td>
-                    <td className="px-4 py-3 text-right font-medium">{formatCurrency(order.amount)}</td>
+                    <td className="px-4 py-3 text-right font-medium text-gray-900">{formatCurrency(order.amount)}</td>
                     <td className="px-4 py-3 text-gray-600">{order.pickupDate}</td>
                     <td className="px-4 py-3 text-gray-600 max-w-[150px] truncate" title={order.origin}>{order.origin}</td>
                     <td className="px-4 py-3 text-gray-600 max-w-[150px] truncate" title={order.destination}>{order.destination}</td>
@@ -344,7 +368,7 @@ const App: React.FC = () => {
                 ))
                 ) : (
                   <tr>
-                    <td colSpan={8} className="px-4 py-8 text-center text-gray-500">
+                    <td colSpan={8} className="px-4 py-12 text-center text-gray-500">
                       Không tìm thấy đơn hàng nào phù hợp với bộ lọc.
                     </td>
                   </tr>
@@ -358,9 +382,9 @@ const App: React.FC = () => {
         <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
           
           {/* Status Distribution */}
-          <div className="bg-white p-4 rounded-lg shadow-sm border border-gray-100">
-             <div className="flex items-center justify-between mb-4">
-               <h3 className="font-bold text-gray-700">Tỷ lệ trạng thái đơn hàng</h3>
+          <div className="bg-white p-6 rounded-lg shadow-sm border border-gray-200">
+             <div className="flex items-center justify-between mb-6">
+               <h3 className="font-bold text-lg text-gray-900">Tỷ lệ trạng thái đơn hàng</h3>
              </div>
              <div className="h-64">
                 <ResponsiveContainer width="100%" height="100%">
@@ -388,29 +412,30 @@ const App: React.FC = () => {
              </div>
           </div>
 
-          {/* Revenue Analysis */}
-          <div className="bg-white p-4 rounded-lg shadow-sm border border-gray-100">
-             <div className="flex items-center justify-between mb-4">
-               <h3 className="font-bold text-gray-700">Doanh thu theo nghiệp vụ</h3>
-               <button className="text-xs text-teal-600 font-medium hover:underline">Xem tất cả</button>
-             </div>
-             <div className="space-y-4">
-                {REVENUE_DATA.map((item) => (
-                  <div key={item.id} className="flex items-center justify-between p-3 bg-gray-50 rounded-lg hover:bg-gray-100 transition-colors cursor-pointer">
-                    <div className="flex items-center gap-3">
-                      <div className="w-10 h-10 rounded-full bg-teal-100 flex items-center justify-center text-teal-600">
-                        <Package className="w-5 h-5" />
-                      </div>
-                      <div>
-                        <p className="font-semibold text-gray-800 text-sm">{item.category}</p>
-                        <p className="text-xs text-gray-500">{item.count} đơn hàng</p>
-                      </div>
-                    </div>
-                    <div className="text-right">
-                      <p className="font-bold text-teal-700">{formatCurrency(item.amount)} ₫</p>
-                    </div>
-                  </div>
-                ))}
+          {/* Revenue Analysis Table */}
+          <div className="bg-white p-6 rounded-lg shadow-sm border border-gray-200 flex flex-col h-full">
+             <h3 className="font-bold text-xl text-gray-900 mb-6">Tổng doanh thu theo tháng</h3>
+             <div className="overflow-auto flex-grow">
+                <table className="w-full text-sm min-w-[300px]">
+                   <thead className="sticky top-0">
+                      <tr className="bg-[#00796b] text-white">
+                         <th className="py-3 px-2 font-medium text-center rounded-tl-sm">STT</th>
+                         <th className="py-3 px-2 font-medium text-center border-l border-white/20">Tác nghiệp</th>
+                         <th className="py-3 px-2 font-medium text-center border-l border-white/20">Tổng đơn</th>
+                         <th className="py-3 px-4 font-medium text-right border-l border-white/20 rounded-tr-sm">Doanh thu</th>
+                      </tr>
+                   </thead>
+                   <tbody className="divide-y divide-gray-100">
+                      {REVENUE_DATA.map((item, index) => (
+                         <tr key={item.id} className="hover:bg-gray-50">
+                            <td className="py-4 px-2 text-center text-gray-600">{index + 1}</td>
+                            <td className="py-4 px-2 text-center text-gray-900 font-medium uppercase">{item.category}</td>
+                            <td className="py-4 px-2 text-center text-gray-600">{item.count}</td>
+                            <td className="py-4 px-4 text-right text-gray-900 font-medium">{formatCurrency(item.amount)}</td>
+                         </tr>
+                      ))}
+                   </tbody>
+                </table>
              </div>
           </div>
         </div>
