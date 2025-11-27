@@ -105,11 +105,25 @@ const STATUS_CONFIG = {
 const TOTAL_ORDERS = 33; // Mock total
 
 const ChartData = [
-  { name: 'Thành công', value: 23, color: '#22c55e' }, // green-500
-  { name: 'Đang vận chuyển', value: 2, color: '#3b82f6' }, // blue-500
-  { name: 'Chờ vận chuyển', value: 5, color: '#eab308' }, // yellow-500
-  { name: 'Đã hủy', value: 3, color: '#ef4444' }, // red-500
+  { name: 'Thành công', value: 23, color: '#4caf50' }, 
+  { name: 'Đang vận chuyển', value: 2, color: '#2196f3' }, 
+  { name: 'Chờ vận chuyển', value: 5, color: '#ff9800' }, 
+  { name: 'Đã hủy', value: 3, color: '#f44336' }, 
 ];
+
+const RADIAN = Math.PI / 180;
+const renderCustomizedLabel = ({ cx, cy, midAngle, innerRadius, outerRadius, percent, index }: any) => {
+  if (percent === 0) return null;
+  const radius = innerRadius + (outerRadius - innerRadius) * 0.5;
+  const x = cx + radius * Math.cos(-midAngle * RADIAN);
+  const y = cy + radius * Math.sin(-midAngle * RADIAN);
+
+  return (
+    <text x={x} y={y} fill="white" textAnchor={x > cx ? 'start' : 'end'} dominantBaseline="central" className="text-xs font-bold">
+      {`${(percent * 100).toFixed(0)}%`}
+    </text>
+  );
+};
 
 const App: React.FC = () => {
   const [orders] = useState<Order[]>(MOCK_ORDERS);
@@ -153,6 +167,8 @@ const App: React.FC = () => {
   };
 
   const hasActiveFilters = filterText !== '' || filterStatus !== 'ALL' || filterDate !== '';
+
+  const totalChartOrders = ChartData.reduce((acc, cur) => acc + cur.value, 0);
 
   return (
     <div className="min-h-screen flex flex-col font-sans text-gray-900 bg-[#f3f4f6]">
@@ -383,32 +399,48 @@ const App: React.FC = () => {
           
           {/* Status Distribution */}
           <div className="bg-white p-6 rounded-lg shadow-sm border border-gray-200">
-             <div className="flex items-center justify-between mb-6">
-               <h3 className="font-bold text-lg text-gray-900">Tỷ lệ trạng thái đơn hàng</h3>
+             <div className="flex justify-between items-center mb-6">
+               <h3 className="font-bold text-xl text-gray-900">Tình trạng đơn hàng (tỉ lệ)</h3>
+               <span className="text-gray-900 font-bold italic text-sm">Tổng: {totalChartOrders} đơn</span>
              </div>
-             <div className="h-64">
-                <ResponsiveContainer width="100%" height="100%">
-                  <PieChart>
-                    <Pie
-                      data={ChartData}
-                      cx="50%"
-                      cy="50%"
-                      innerRadius={60}
-                      outerRadius={80}
-                      paddingAngle={5}
-                      dataKey="value"
-                    >
-                      {ChartData.map((entry, index) => (
-                        <Cell key={`cell-${index}`} fill={entry.color} />
-                      ))}
-                    </Pie>
-                    <Tooltip 
-                      formatter={(value: number) => [`${value} đơn`, 'Số lượng']}
-                      contentStyle={{ borderRadius: '8px', border: 'none', boxShadow: '0 4px 6px -1px rgb(0 0 0 / 0.1)' }}
-                    />
-                    <Legend verticalAlign="bottom" height={36} />
-                  </PieChart>
-                </ResponsiveContainer>
+             
+             <div className="flex items-center">
+                {/* Chart Area */}
+                <div className="w-[60%] h-64">
+                    <ResponsiveContainer width="100%" height="100%">
+                      <PieChart>
+                        <Pie
+                          data={ChartData}
+                          cx="50%"
+                          cy="50%"
+                          outerRadius={80}
+                          dataKey="value"
+                          labelLine={false}
+                          label={renderCustomizedLabel}
+                        >
+                          {ChartData.map((entry, index) => (
+                            <Cell key={`cell-${index}`} fill={entry.color} stroke="white" strokeWidth={2} />
+                          ))}
+                        </Pie>
+                        <Tooltip 
+                          formatter={(value: number) => [`${value} đơn`, 'Số lượng']}
+                          contentStyle={{ borderRadius: '8px', border: 'none', boxShadow: '0 4px 6px -1px rgb(0 0 0 / 0.1)' }}
+                        />
+                      </PieChart>
+                    </ResponsiveContainer>
+                </div>
+
+                {/* Legend Area */}
+                <div className="w-[40%] pl-4 space-y-4">
+                   {ChartData.map((entry, index) => (
+                      <div key={index} className="flex items-center gap-2">
+                         <div className="w-2.5 h-2.5 rounded-full flex-shrink-0" style={{backgroundColor: entry.color}}></div>
+                         <div className="text-sm text-gray-700 whitespace-nowrap">
+                            {entry.name}: <span className="text-gray-900 font-medium">{entry.value}</span>
+                         </div>
+                      </div>
+                   ))}
+                </div>
              </div>
           </div>
 
