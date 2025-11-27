@@ -4,11 +4,7 @@ import { Footer } from './components/Footer';
 import { StatsCard } from './components/StatsCard';
 import { Order, OrderStatus, RevenueData } from './types';
 import { 
-  Package, 
-  CheckCircle, 
   Truck, 
-  Clock, 
-  XCircle, 
   Edit,
   ArrowRight,
   Bell,
@@ -18,7 +14,7 @@ import {
   X,
   User
 } from 'lucide-react';
-import { PieChart, Pie, Cell, ResponsiveContainer, Legend, Tooltip } from 'recharts';
+import { PieChart, Pie, Cell, ResponsiveContainer, Tooltip } from 'recharts';
 
 // --- MOCK DATA ---
 
@@ -182,64 +178,68 @@ const App: React.FC = () => {
           {/* Left: Stats Grid */}
           <div className="grid grid-cols-2 md:grid-cols-3 xl:grid-cols-5 gap-6 flex-grow w-full">
             <StatsCard 
-              label="Tổng đơn hàng" 
+              label="Tổng số lượng đơn hàng" 
               value={TOTAL_ORDERS} 
-              icon={<Package className="w-6 h-6" />}
-              bgColor="bg-gray-100"
-              textColor="text-gray-600"
+              bgColor="bg-white"
+              titleColor="text-gray-500"
+              valueColor="text-black"
               className="h-full"
             />
             <StatsCard 
-              label="Thành công" 
+              label="Đơn hàng vận chuyển thành công" 
               value={STATUS_CONFIG[OrderStatus.SUCCESS].count} 
-              icon={<CheckCircle className="w-6 h-6" />}
-              bgColor="bg-green-100"
-              textColor="text-green-600"
+              bgColor="bg-[#ecfdf5]"
+              borderColor="border-l-green-500"
+              titleColor="text-green-700"
+              valueColor="text-green-700"
               className="h-full"
             />
             <StatsCard 
-              label="Đang vận chuyển" 
+              label="Đơn hàng đang vận chuyển" 
               value={STATUS_CONFIG[OrderStatus.IN_TRANSIT].count} 
-              icon={<Truck className="w-6 h-6" />}
-              bgColor="bg-blue-100"
-              textColor="text-blue-600"
+              bgColor="bg-[#eff6ff]"
+              borderColor="border-l-blue-500"
+              titleColor="text-blue-700"
+              valueColor="text-blue-700"
               className="h-full"
             />
             <StatsCard 
-              label="Chờ vận chuyển" 
+              label="Đơn hàng chờ vận chuyển" 
               value={STATUS_CONFIG[OrderStatus.PENDING].count} 
-              icon={<Clock className="w-6 h-6" />}
-              bgColor="bg-yellow-100"
-              textColor="text-yellow-600"
+              bgColor="bg-[#fefce8]"
+              borderColor="border-l-yellow-500"
+              titleColor="text-yellow-700"
+              valueColor="text-yellow-700"
               className="h-full"
             />
             <StatsCard 
-              label="Đã hủy" 
+              label="Đơn hàng đã hủy" 
               value={STATUS_CONFIG[OrderStatus.CANCELLED].count} 
-              icon={<XCircle className="w-6 h-6" />}
-              bgColor="bg-red-100"
-              textColor="text-red-600"
+              bgColor="bg-[#fef2f2]"
+              borderColor="border-l-red-500"
+              titleColor="text-red-700"
+              valueColor="text-red-700"
               className="h-full"
             />
           </div>
 
           {/* Right: User Profile Card */}
-          <div className="bg-white rounded-lg shadow-sm border border-gray-200 w-full xl:w-[380px] flex-shrink-0 p-6 flex flex-col gap-6">
+          <div className="bg-white rounded-lg shadow-sm border border-gray-200 w-full xl:w-[380px] flex-shrink-0 p-4 flex flex-col gap-3">
              {/* Header */}
              <div className="flex justify-between items-start">
-                <div className="flex items-center gap-4">
-                  <div className="w-12 h-12 bg-gray-100 rounded-full flex items-center justify-center text-gray-400 shrink-0">
-                     <User className="w-6 h-6" />
+                <div className="flex items-center gap-3">
+                  <div className="w-10 h-10 bg-gray-100 rounded-full flex items-center justify-center text-gray-400 shrink-0">
+                     <User className="w-5 h-5" />
                   </div>
                   <div>
-                     <h3 className="font-bold text-lg text-gray-900 flex items-center gap-2">
+                     <h3 className="font-bold text-base text-gray-900 flex items-center gap-2">
                         Administrator 
                         <Edit className="w-3.5 h-3.5 text-gray-400 cursor-pointer hover:text-teal-600 transition-colors" />
                      </h3>
-                     <p className="text-xs text-teal-600 font-semibold uppercase tracking-wide">Quản trị viên</p>
+                     <p className="text-[11px] text-teal-600 font-semibold uppercase tracking-wide">Quản trị viên</p>
                   </div>
                 </div>
-                <button className="bg-teal-600 hover:bg-teal-700 text-white px-4 py-2 rounded-md text-sm font-medium shadow-sm transition-colors whitespace-nowrap">
+                <button className="bg-teal-600 hover:bg-teal-700 text-white px-3 py-1.5 rounded-md text-xs font-medium shadow-sm transition-colors whitespace-nowrap">
                    Đặt xe
                 </button>
              </div>
@@ -248,21 +248,21 @@ const App: React.FC = () => {
              <div className="h-px bg-gray-100 w-full"></div>
 
              {/* Info Rows */}
-             <div className="space-y-4">
-                <div className="flex text-sm items-start">
-                   <span className="text-gray-500 italic w-24 flex-shrink-0">Mã số thuế:</span>
+             <div className="space-y-2">
+                <div className="flex text-xs items-start">
+                   <span className="text-gray-500 italic w-20 flex-shrink-0">Mã số thuế:</span>
                    <span className="text-gray-900 font-medium"></span>
                 </div>
-                <div className="flex text-sm items-start">
-                   <span className="text-gray-500 italic w-24 flex-shrink-0">Địa chỉ:</span>
+                <div className="flex text-xs items-start">
+                   <span className="text-gray-500 italic w-20 flex-shrink-0">Địa chỉ:</span>
                    <span className="text-gray-900 font-medium uppercase leading-snug">CTY TNHH DV TIN HỌC CEH</span>
                 </div>
-                <div className="flex text-sm items-start">
-                   <span className="text-gray-500 italic w-24 flex-shrink-0">Email:</span>
+                <div className="flex text-xs items-start">
+                   <span className="text-gray-500 italic w-20 flex-shrink-0">Email:</span>
                    <span className="text-gray-900 font-medium break-all">doanvanhieu.info@gmail.com</span>
                 </div>
-                <div className="flex text-sm items-start">
-                   <span className="text-gray-500 italic w-24 flex-shrink-0">Điện thoại:</span>
+                <div className="flex text-xs items-start">
+                   <span className="text-gray-500 italic w-20 flex-shrink-0">Điện thoại:</span>
                    <span className="text-gray-900 font-medium">4324234332</span>
                 </div>
              </div>
@@ -270,7 +270,7 @@ const App: React.FC = () => {
         </div>
 
         {/* Orders Table Section */}
-        <div className="bg-white rounded-lg shadow-sm border border-gray-200 overflow-hidden">
+        <div className="bg-white rounded-lg shadow-md border border-gray-200 overflow-hidden">
           <div className="p-5 border-b border-gray-200 flex flex-col gap-5">
             {/* Header Title & Actions */}
             <div className="flex justify-between items-center">
@@ -352,31 +352,31 @@ const App: React.FC = () => {
 
           <div className="overflow-x-auto">
             <table className="w-full text-sm text-left">
-              <thead className="bg-gray-50 text-gray-700 font-semibold border-b border-gray-200">
+              <thead className="bg-[#00796b] text-white font-bold border-b border-gray-200">
                 <tr>
-                  <th className="px-4 py-3 whitespace-nowrap">STT</th>
-                  <th className="px-4 py-3 whitespace-nowrap">Mã đơn hàng</th>
-                  <th className="px-4 py-3 whitespace-nowrap">Số Container</th>
-                  <th className="px-4 py-3 whitespace-nowrap text-right">Số tiền</th>
-                  <th className="px-4 py-3 whitespace-nowrap">Ngày lấy hàng</th>
-                  <th className="px-4 py-3 whitespace-nowrap">Điểm đi</th>
-                  <th className="px-4 py-3 whitespace-nowrap">Điểm đến</th>
+                  <th className="px-4 py-3 whitespace-nowrap border-r border-teal-800/30">STT</th>
+                  <th className="px-4 py-3 whitespace-nowrap border-r border-teal-800/30">Mã đơn hàng</th>
+                  <th className="px-4 py-3 whitespace-nowrap border-r border-teal-800/30">Số Container</th>
+                  <th className="px-4 py-3 whitespace-nowrap text-right border-r border-teal-800/30">Số tiền</th>
+                  <th className="px-4 py-3 whitespace-nowrap border-r border-teal-800/30">Ngày lấy hàng</th>
+                  <th className="px-4 py-3 whitespace-nowrap border-r border-teal-800/30">Điểm đi</th>
+                  <th className="px-4 py-3 whitespace-nowrap border-r border-teal-800/30">Điểm đến</th>
                   <th className="px-4 py-3 whitespace-nowrap text-center">Trạng thái</th>
                 </tr>
               </thead>
               <tbody className="divide-y divide-gray-100">
                 {filteredOrders.length > 0 ? (
                   filteredOrders.map((order, index) => (
-                  <tr key={order.id} className="hover:bg-gray-50 transition-colors">
-                    <td className="px-4 py-3 text-gray-500">{index + 1}</td>
-                    <td className="px-4 py-3 font-medium text-teal-700">{order.orderCode}</td>
-                    <td className="px-4 py-3">
+                  <tr key={order.id} className="hover:bg-blue-50 even:bg-gray-50 transition-colors">
+                    <td className="px-4 py-3 text-gray-500 border-r border-gray-100">{index + 1}</td>
+                    <td className="px-4 py-3 font-medium text-teal-700 border-r border-gray-100">{order.orderCode}</td>
+                    <td className="px-4 py-3 border-r border-gray-100">
                       <div className="font-medium text-gray-900">{order.containerNo}</div>
                     </td>
-                    <td className="px-4 py-3 text-right font-medium text-gray-900">{formatCurrency(order.amount)}</td>
-                    <td className="px-4 py-3 text-gray-600">{order.pickupDate}</td>
-                    <td className="px-4 py-3 text-gray-600 max-w-[150px] truncate" title={order.origin}>{order.origin}</td>
-                    <td className="px-4 py-3 text-gray-600 max-w-[150px] truncate" title={order.destination}>{order.destination}</td>
+                    <td className="px-4 py-3 text-right font-medium text-gray-900 border-r border-gray-100">{formatCurrency(order.amount)}</td>
+                    <td className="px-4 py-3 text-gray-600 border-r border-gray-100">{order.pickupDate}</td>
+                    <td className="px-4 py-3 text-gray-600 max-w-[150px] truncate border-r border-gray-100" title={order.origin}>{order.origin}</td>
+                    <td className="px-4 py-3 text-gray-600 max-w-[150px] truncate border-r border-gray-100" title={order.destination}>{order.destination}</td>
                     <td className="px-4 py-3 text-center">
                       {getStatusBadge(order.status)}
                     </td>
@@ -451,18 +451,18 @@ const App: React.FC = () => {
                 <table className="w-full text-sm min-w-[300px]">
                    <thead className="sticky top-0">
                       <tr className="bg-[#00796b] text-white">
-                         <th className="py-3 px-2 font-medium text-center rounded-tl-sm">STT</th>
-                         <th className="py-3 px-2 font-medium text-center border-l border-white/20">Tác nghiệp</th>
-                         <th className="py-3 px-2 font-medium text-center border-l border-white/20">Tổng đơn</th>
-                         <th className="py-3 px-4 font-medium text-right border-l border-white/20 rounded-tr-sm">Doanh thu</th>
+                         <th className="py-3 px-2 font-medium text-center rounded-tl-sm border-r border-teal-800/30">STT</th>
+                         <th className="py-3 px-2 font-medium text-center border-r border-teal-800/30">Tác nghiệp</th>
+                         <th className="py-3 px-2 font-medium text-center border-r border-teal-800/30">Tổng đơn</th>
+                         <th className="py-3 px-4 font-medium text-right rounded-tr-sm">Doanh thu</th>
                       </tr>
                    </thead>
                    <tbody className="divide-y divide-gray-100">
                       {REVENUE_DATA.map((item, index) => (
-                         <tr key={item.id} className="hover:bg-gray-50">
-                            <td className="py-4 px-2 text-center text-gray-600">{index + 1}</td>
-                            <td className="py-4 px-2 text-center text-gray-900 font-medium uppercase">{item.category}</td>
-                            <td className="py-4 px-2 text-center text-gray-600">{item.count}</td>
+                         <tr key={item.id} className="hover:bg-blue-50 even:bg-gray-50 transition-colors">
+                            <td className="py-4 px-2 text-center text-gray-600 border-r border-gray-100">{index + 1}</td>
+                            <td className="py-4 px-2 text-center text-gray-900 font-medium uppercase border-r border-gray-100">{item.category}</td>
+                            <td className="py-4 px-2 text-center text-gray-600 border-r border-gray-100">{item.count}</td>
                             <td className="py-4 px-4 text-right text-gray-900 font-medium">{formatCurrency(item.amount)}</td>
                          </tr>
                       ))}
