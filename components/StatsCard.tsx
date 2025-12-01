@@ -1,32 +1,37 @@
-import React from 'react';
+import React, { ReactNode } from 'react';
 
 interface StatsCardProps {
   label: string;
   value: number;
-  bgColor: string;      // Tailwind class for background
-  borderColor?: string; // Tailwind class for left border color (e.g., border-green-500)
-  titleColor: string;   // Tailwind class for label text color
-  valueColor: string;   // Tailwind class for number text color
+  icon: ReactNode;
+  iconBgColor: string; // Tailwind class, e.g., 'bg-blue-100'
+  iconColor: string;   // Tailwind class, e.g., 'text-blue-600'
+  valueColor?: string; // Tailwind class, e.g., 'text-blue-600'
   className?: string;
 }
 
 export const StatsCard: React.FC<StatsCardProps> = ({ 
   label, 
   value, 
-  bgColor, 
-  borderColor, 
-  titleColor, 
-  valueColor,
+  icon,
+  iconBgColor,
+  iconColor,
+  valueColor = 'text-gray-900',
   className = '' 
 }) => {
   return (
-    <div className={`rounded-lg p-4 shadow-sm border border-gray-100 h-full flex flex-col justify-between transition-transform hover:scale-[1.02] ${bgColor} ${borderColor ? `border-l-[6px] ${borderColor}` : ''} ${className}`}>
-      <h3 className={`font-bold text-xs uppercase leading-relaxed ${titleColor}`}>
-        {label}
-      </h3>
-      <p className={`text-3xl font-bold mt-2 ${valueColor}`}>
-        {value}
-      </p>
+    <div className={`flex items-center gap-4 p-4 h-full ${className}`}>
+      <div className={`w-12 h-12 rounded-lg flex items-center justify-center shrink-0 ${iconBgColor} ${iconColor}`}>
+        {icon}
+      </div>
+      <div className="flex flex-col">
+        <h3 className="font-bold text-xs text-gray-500 uppercase leading-tight mb-1">
+          {label}
+        </h3>
+        <p className={`text-2xl font-bold leading-none ${valueColor}`}>
+          {value}
+        </p>
+      </div>
     </div>
   );
 };

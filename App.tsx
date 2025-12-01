@@ -12,7 +12,13 @@ import {
   Filter,
   Calendar,
   X,
-  User
+  User,
+  Box,
+  CheckCircle,
+  Clock,
+  XCircle,
+  Mail,
+  Phone
 } from 'lucide-react';
 import { PieChart, Pie, Cell, ResponsiveContainer, Tooltip } from 'recharts';
 
@@ -172,100 +178,95 @@ const App: React.FC = () => {
 
       <main className="flex-grow container mx-auto px-4 py-8 space-y-8">
         
-        {/* Top Section: Stats and Company Profile */}
-        <div className="flex flex-col xl:flex-row gap-8">
-          
-          {/* Left: Stats Grid */}
-          <div className="grid grid-cols-2 md:grid-cols-3 xl:grid-cols-5 gap-6 flex-grow w-full">
-            <StatsCard 
-              label="Tổng số lượng đơn hàng" 
-              value={TOTAL_ORDERS} 
-              bgColor="bg-white"
-              titleColor="text-gray-500"
-              valueColor="text-black"
-              className="h-full"
-            />
-            <StatsCard 
-              label="Đơn hàng vận chuyển thành công" 
-              value={STATUS_CONFIG[OrderStatus.SUCCESS].count} 
-              bgColor="bg-[#ecfdf5]"
-              borderColor="border-l-green-500"
-              titleColor="text-green-700"
-              valueColor="text-green-700"
-              className="h-full"
-            />
-            <StatsCard 
-              label="Đơn hàng đang vận chuyển" 
-              value={STATUS_CONFIG[OrderStatus.IN_TRANSIT].count} 
-              bgColor="bg-[#eff6ff]"
-              borderColor="border-l-blue-500"
-              titleColor="text-blue-700"
-              valueColor="text-blue-700"
-              className="h-full"
-            />
-            <StatsCard 
-              label="Đơn hàng chờ vận chuyển" 
-              value={STATUS_CONFIG[OrderStatus.PENDING].count} 
-              bgColor="bg-[#fefce8]"
-              borderColor="border-l-yellow-500"
-              titleColor="text-yellow-700"
-              valueColor="text-yellow-700"
-              className="h-full"
-            />
-            <StatsCard 
-              label="Đơn hàng đã hủy" 
-              value={STATUS_CONFIG[OrderStatus.CANCELLED].count} 
-              bgColor="bg-[#fef2f2]"
-              borderColor="border-l-red-500"
-              titleColor="text-red-700"
-              valueColor="text-red-700"
-              className="h-full"
-            />
-          </div>
+        {/* Top Section: Single Row Card with Dividers */}
+        <div className="bg-white rounded-lg shadow-sm border border-gray-200 overflow-hidden">
+          <div className="grid grid-cols-1 xl:grid-cols-6 divide-y xl:divide-y-0 xl:divide-x divide-gray-100">
+              
+              {/* 1. Total Orders */}
+              <div className="min-h-[90px]">
+                <StatsCard 
+                  label="Tổng đơn hàng" 
+                  value={TOTAL_ORDERS} 
+                  icon={<Box className="w-6 h-6" />}
+                  iconBgColor="bg-gray-100"
+                  iconColor="text-gray-600"
+                  valueColor="text-gray-800"
+                />
+              </div>
 
-          {/* Right: User Profile Card */}
-          <div className="bg-white rounded-lg shadow-sm border border-gray-200 w-full xl:w-[380px] flex-shrink-0 p-4 flex flex-col gap-3">
-             {/* Header */}
-             <div className="flex justify-between items-start">
-                <div className="flex items-center gap-3">
-                  <div className="w-10 h-10 bg-gray-100 rounded-full flex items-center justify-center text-gray-400 shrink-0">
-                     <User className="w-5 h-5" />
-                  </div>
-                  <div>
-                     <h3 className="font-bold text-base text-gray-900 flex items-center gap-2">
-                        Administrator 
-                        <Edit className="w-3.5 h-3.5 text-gray-400 cursor-pointer hover:text-teal-600 transition-colors" />
-                     </h3>
-                     <p className="text-[11px] text-teal-600 font-semibold uppercase tracking-wide">Quản trị viên</p>
-                  </div>
-                </div>
-                <button className="bg-teal-600 hover:bg-teal-700 text-white px-3 py-1.5 rounded-md text-xs font-medium shadow-sm transition-colors whitespace-nowrap">
-                   Đặt xe
-                </button>
-             </div>
+              {/* 2. Success */}
+              <div className="min-h-[90px]">
+                <StatsCard 
+                  label="Thành công" 
+                  value={STATUS_CONFIG[OrderStatus.SUCCESS].count} 
+                  icon={<CheckCircle className="w-6 h-6" />}
+                  iconBgColor="bg-green-100"
+                  iconColor="text-green-600"
+                  valueColor="text-green-600"
+                />
+              </div>
 
-             {/* Divider */}
-             <div className="h-px bg-gray-100 w-full"></div>
+              {/* 3. In Transit */}
+              <div className="min-h-[90px]">
+                <StatsCard 
+                  label="Đang vận chuyển" 
+                  value={STATUS_CONFIG[OrderStatus.IN_TRANSIT].count} 
+                  icon={<Truck className="w-6 h-6" />}
+                  iconBgColor="bg-blue-100"
+                  iconColor="text-blue-600"
+                  valueColor="text-blue-600"
+                />
+              </div>
 
-             {/* Info Rows */}
-             <div className="space-y-2">
-                <div className="flex text-xs items-start">
-                   <span className="text-gray-500 italic w-20 flex-shrink-0">Mã số thuế:</span>
-                   <span className="text-gray-900 font-medium"></span>
-                </div>
-                <div className="flex text-xs items-start">
-                   <span className="text-gray-500 italic w-20 flex-shrink-0">Địa chỉ:</span>
-                   <span className="text-gray-900 font-medium uppercase leading-snug">CTY TNHH DV TIN HỌC CEH</span>
-                </div>
-                <div className="flex text-xs items-start">
-                   <span className="text-gray-500 italic w-20 flex-shrink-0">Email:</span>
-                   <span className="text-gray-900 font-medium break-all">doanvanhieu.info@gmail.com</span>
-                </div>
-                <div className="flex text-xs items-start">
-                   <span className="text-gray-500 italic w-20 flex-shrink-0">Điện thoại:</span>
-                   <span className="text-gray-900 font-medium">4324234332</span>
-                </div>
-             </div>
+              {/* 4. Pending */}
+              <div className="min-h-[90px]">
+                <StatsCard 
+                  label="Chờ vận chuyển" 
+                  value={STATUS_CONFIG[OrderStatus.PENDING].count} 
+                  icon={<Clock className="w-6 h-6" />}
+                  iconBgColor="bg-yellow-100"
+                  iconColor="text-yellow-600"
+                  valueColor="text-yellow-600"
+                />
+              </div>
+
+              {/* 5. Cancelled */}
+              <div className="min-h-[90px]">
+                <StatsCard 
+                  label="Đã hủy" 
+                  value={STATUS_CONFIG[OrderStatus.CANCELLED].count} 
+                  icon={<XCircle className="w-6 h-6" />}
+                  iconBgColor="bg-red-100"
+                  iconColor="text-red-600"
+                  valueColor="text-red-600"
+                />
+              </div>
+
+              {/* 6. Profile Section */}
+              <div className="min-h-[90px] p-4 flex items-start gap-4">
+                 <div className="w-12 h-12 bg-emerald-50 rounded-full flex items-center justify-center text-emerald-600 shrink-0">
+                   <User className="w-6 h-6" />
+                 </div>
+                 <div className="flex flex-col gap-0.5 overflow-hidden">
+                   <h3 className="font-bold text-sm text-gray-900 leading-tight">Công ty TNHH XNK</h3>
+                   <button className="text-xs text-teal-600 flex items-center gap-1 hover:underline w-fit">
+                     <Edit className="w-3 h-3" />
+                     Cập nhật
+                   </button>
+                   
+                   <div className="mt-1 space-y-0.5">
+                     <div className="flex items-center gap-2 text-xs text-gray-600">
+                       <Mail className="w-3.5 h-3.5 shrink-0" />
+                       <span className="truncate" title="duynguyen2454@gmail.com">duynguyen2454@gmail.com</span>
+                     </div>
+                     <div className="flex items-center gap-2 text-xs text-gray-600">
+                       <Phone className="w-3.5 h-3.5 shrink-0" />
+                       <span>0942322454</span>
+                     </div>
+                   </div>
+                 </div>
+              </div>
+
           </div>
         </div>
 
